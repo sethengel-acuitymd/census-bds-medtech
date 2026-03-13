@@ -28,8 +28,14 @@ st.sidebar.title("Settings")
 naics = st.sidebar.text_input("NAICS Code", value="3391")
 naics_label = st.sidebar.text_input("Industry Label", value="Medical Equipment & Supplies")
 
-ts = load_timeseries(naics)
-age_df = load_firm_age(naics)
+try:
+    with st.spinner("Loading data from Census Bureau BDS API..."):
+        ts = load_timeseries(naics)
+        age_df = load_firm_age(naics)
+except Exception as e:
+    st.error(f"Failed to load data from Census Bureau API: {e}")
+    st.info("The Census Bureau API may be temporarily unavailable. Please try again later.")
+    st.stop()
 
 metrics = survival.compute_annual_metrics(ts)
 year_range = st.sidebar.slider(
